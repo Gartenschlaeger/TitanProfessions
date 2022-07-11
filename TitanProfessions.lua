@@ -203,16 +203,12 @@ function TitanPanelProfessionsButton_GetTooltipText(self)
             result = strconcat(result, name, '\n')
 
             if (playerInfo.professions.prof1) then
-                result = strconcat(result, '|cffffffff', ProfessionsDB[playerInfo.professions.prof1].name,
-                    '\t',
-                    '-',
-                    '\n')
+                local professionName = WrapTextInColorCode(ProfessionsDB[playerInfo.professions.prof1].name, 'ffffffff')
+                result = strconcat(result, professionName, '\t', '-', '\n')
             end
             if (playerInfo.professions.prof2) then
-                result = strconcat(result, '|cffffffff', ProfessionsDB[playerInfo.professions.prof2].name,
-                    '\t',
-                    '-',
-                    '\n')
+                local professionName = WrapTextInColorCode(ProfessionsDB[playerInfo.professions.prof2].name, 'ffffffff')
+                result = strconcat(result, professionName, '\t', '-', '\n')
             end
 
         end
