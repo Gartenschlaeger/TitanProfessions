@@ -27,7 +27,7 @@ function TitanPanelProfessionsButton_OnLoad(self)
         tooltipTitle = 'Professions',
         tooltipTextFunction = 'TitanPanelProfessionsButton_GetTooltipText',
         controlVariables = {
-            ShowIcon = false,
+            ShowIcon = false, -- TODO: icon
             ShowLabelText = true,
             ShowRegularText = false,
             ShowColoredText = false,
@@ -90,11 +90,14 @@ local function trackPlayer(playerGuid)
     local info = PlayersDB[playerGuid] or {}
     PlayersDB[playerGuid] = info
 
+    local _, unitClass = UnitClass('player')
+
     info.realm = trackRealm()
     info.name = UnitName('player')
-    info.professions = {}
+    info.class = unitClass
 
     local prof1, prof2, archaeology, fishing, cooking = GetProfessions()
+    info.professions = {}
     info.professions.prof1 = trackProfession(prof1)
     info.professions.prof2 = trackProfession(prof2)
     info.professions.archaeology = trackProfession(archaeology)
@@ -191,7 +194,13 @@ function TitanPanelProfessionsButton_GetTooltipText(self)
     for _, playerInfo in pairs(PlayersDB) do
         if (playerInfo.professions.prof1 or playerInfo.professions.prof2) then
             result = strconcat(result, '\n')
-            result = strconcat(result, playerInfo.name, '\n')
+
+            local name = playerInfo.name
+            if (playerInfo.class) then
+                name = RAID_CLASS_COLORS[playerInfo.class]:WrapTextInColorCode(playerInfo.name)
+            end
+
+            result = strconcat(result, name, '\n')
 
             if (playerInfo.professions.prof1) then
                 result = strconcat(result, '|cffffffff', ProfessionsDB[playerInfo.professions.prof1].name,
