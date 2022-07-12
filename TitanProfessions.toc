@@ -8,5 +8,8 @@
 ## Version: 9.0.1
 
 Local.lua
+LocalDE.lua
 Helper.lua
+
+TitanProfessions.lua
 TitanProfessions.xml
