@@ -10,9 +10,6 @@
 		 				TitanPanelProfessionsButton_OnLoad(self);
 						TitanPanelButton_OnLoad(self);
 					</OnLoad>
-                    <OnEvent>
-						TitanPanelProfessionsButton_OnEvent(self, event, ...);
-					</OnEvent>
                     <OnClick>
 						TitanPanelProfessionsButton_OnClick(self, button);
 						TitanPanelButton_OnClick(self, button);

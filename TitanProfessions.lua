@@ -14,6 +14,7 @@ local eventsFrame = CreateFrame("frame")
 
 function TitanPanelProfessionsButton_OnLoad(self)
     --  print('TitanPanelProfessionsButton_OnLoad')
+
     self.registry = {
         id = TITAN_PROFESSIONS_ID,
         category = "Information",
@@ -41,7 +42,7 @@ function TitanPanelProfessionsButton_OnLoad(self)
 end
 
 function TitanPanelRightClickMenu_PrepareProfessionsMenu()
-    --print('TitanPanelRightClickMenu_PrepareProfessionsMenu')
+    -- print('TitanPanelRightClickMenu_PrepareProfessionsMenu')
 
     local dropDownLevel = TitanPanelRightClickMenu_GetDropdownLevel()
     local dropDownValue = TitanPanelRightClickMenu_GetDropdMenuValue()
@@ -93,95 +94,11 @@ function TitanPanelRightClickMenu_PrepareProfessionsMenu()
     end
 end
 
-local function trackRealm()
-    local realmId = GetRealmID()
-    RealmsDB[realmId] = GetRealmName()
-
-    return realmId
-end
-
-local function trackProfession(playerProfessionIndex)
-    if (playerProfessionIndex == nil) then
-        return nil
-    end
-
-    local name, icon = GetProfessionInfo(playerProfessionIndex)
-    -- print('|T' .. icon .. ':12|t ' .. name .. ' ' .. skillLevel .. ' / ' .. maxSkillLevel)
-
-    for professionId, professionInfo in pairs(ProfessionsDB) do
-        if (professionInfo.name == name) then
-            professionInfo.icon = icon
-            return professionId
-        end
-    end
-
-    local professionId = 1000 + core.helper:tableSize(ProfessionsDB)
-    ProfessionsDB[professionId] = {
-        name = name,
-        icon = icon
-    }
-
-    return professionId
-end
-
-local function trackPlayer(playerGuid)
-    local info = PlayersDB[playerGuid] or {}
-    PlayersDB[playerGuid] = info
-
-    local _, unitClass = UnitClass('player')
-
-    info.realm = trackRealm()
-    info.name = UnitName('player')
-    info.class = unitClass
-
-    local prof1, prof2, archaeology, fishing, cooking = GetProfessions()
-    info.professions = {}
-    info.professions.prof1 = trackProfession(prof1)
-    info.professions.prof2 = trackProfession(prof2)
-    info.professions.archaeology = trackProfession(archaeology)
-    info.professions.fishing = trackProfession(fishing)
-    info.professions.cooking = trackProfession(cooking)
-
-    return info
-end
-
-local function updatePlayerProfessions()
-    --print('updatePlayerProfessions')
-
-    local playerGuid = UnitGUID('player')
-    if (playerGuid) then
-        trackPlayer(playerGuid)
-    end
-end
-
 function TitanPanelProfessionsButton_OnUpdate(self, event, ...)
     -- print('TitanPanelProfessionsButton_OnUpdate', event, ...)
 
     if (event == 'PLAYER_ENTERING_WORLD') then
-        updatePlayerProfessions()
-
-    end
-end
-
-local function buildPrimaryProfessionsText(playerInfo, separator, defaultText)
-    local prof1 = playerInfo.professions.prof1
-    local prof2 = playerInfo.professions.prof2
-    if (prof1 or prof2) then
-        local result = ''
-        if (prof1) then
-            result = result .. ProfessionsDB[prof1].name
-            if (prof2) then
-                result = result .. separator
-            end
-        end
-
-        if (prof2) then
-            result = result .. ProfessionsDB[prof2].name
-        end
-
-        return result
-    else
-        return defaultText
+        core.tracking:trackPlayer()
     end
 end
 
@@ -210,7 +127,7 @@ function TitanPanelProfessionsButton_GetButtonText(id)
         end
 
         if (playerInfo) then
-            result = result .. buildPrimaryProfessionsText(playerInfo, ' / ', '-')
+            result = result .. core.helper:buildPrimaryProfessionsText(playerInfo, ' / ', '-')
         end
     end
 
@@ -240,17 +157,13 @@ function TitanPanelProfessionsButton_GetTooltipText(self)
                 local professionName = WrapTextInColorCode(ProfessionsDB[playerInfo.professions.prof2].name, 'ffffffff')
                 result = strconcat(result, professionName, '\n') --, '\t', '-', '\n')
             end
-
         end
     end
 
     return result
 end
 
-function TitanPanelProfessionsButton_OnEvent(self, event, ...)
-    --print('TitanPanelProfessionsButton_OnEvent', event, ...)
-end
-
 function TitanPanelProfessionsButton_OnClick(self, button)
-    --print('TitanPanelProfessionsButton_OnClick')
+    -- print('TitanPanelProfessionsButton_OnClick')
+
 end

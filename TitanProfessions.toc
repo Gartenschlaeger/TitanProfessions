@@ -10,6 +10,7 @@
 Local.lua
 LocalDE.lua
 Helper.lua
+Tracking.lua
 
 TitanProfessions.lua
 TitanProfessions.xml
