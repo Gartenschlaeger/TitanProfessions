@@ -147,16 +147,20 @@ local function getTooltipGroupedByCharacter()
 end
 
 local function getTooltipGroupedByProfession()
-    local sortedKeys = core.helper:getKeysSortedByValue(ProfessionsDB, function(a, b)
+    local sortedProfessionKeys = core.helper:getKeysSortedByValue(ProfessionsDB, function(a, b)
+        return a.name < b.name
+    end)
+    local sortedPlayerKeys = core.helper:getKeysSortedByValue(PlayersDB, function(a, b)
         return a.name < b.name
     end)
 
     local result = ''
-    for _, k in pairs(sortedKeys) do
+    for _, k in pairs(sortedProfessionKeys) do
         local addProfession = false
 
         local players = {}
-        for _, playerInfo in pairs(PlayersDB) do
+        for _, playerGuid in pairs(sortedPlayerKeys) do
+            local playerInfo = PlayersDB[playerGuid]
             if (playerInfo.professions.prof1 == k or
                 playerInfo.professions.prof2 == k or
                 playerInfo.professions.fishing == k or
