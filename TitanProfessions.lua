@@ -123,7 +123,7 @@ function TitanPanelProfessionsButton_GetButtonText(id)
     if (playerGuid) then
         local playerInfo = PlayersDB[playerGuid]
         if (not playerInfo) then
-            playerInfo = trackPlayer(playerGuid)
+            playerInfo = core.tracking:trackPlayer()
         end
 
         if (playerInfo) then
