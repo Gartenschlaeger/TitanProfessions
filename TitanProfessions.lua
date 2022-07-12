@@ -1,11 +1,5 @@
+---@class TitanPanel_ProfessionsCore
 local _, core = ...
-
-core.i18n = {}
-core.i18n.PluginName = 'Professions'
-
-if (GetLocale() == 'deDE') then
-    core.i18n.PluginName = 'Berufe'
-end
 
 TITAN_PROFESSIONS_VERSION = "9.0.1"
 TITAN_PROFESSIONS_ID = "Professions"
@@ -13,6 +7,8 @@ TITAN_PROFESSIONS_ID = "Professions"
 RealmsDB = {}
 ProfessionsDB = {}
 PlayersDB = {}
+
+local L = LibStub("AceLocale-3.0"):GetLocale("Titan", true)
 
 local eventsFrame = CreateFrame("frame")
 
@@ -29,15 +25,13 @@ function TitanPanelProfessionsButton_OnLoad(self)
         controlVariables = {
             ShowIcon = false, -- TODO: icon
             ShowLabelText = true,
-            ShowRegularText = false,
-            ShowColoredText = false,
             DisplayOnRightSide = false,
         },
         savedVariables = {
-            ShowIcon = 1,
-            ShowLabelText = 1,
-            ShowRegularText = 1,
-            ShowColoredText = 1,
+            ShowIcon = false,
+            ShowLabelText = true,
+            GroupByCharacter = true,
+            GroupByProfession = false
         }
     };
 
@@ -46,13 +40,57 @@ function TitanPanelProfessionsButton_OnLoad(self)
     eventsFrame:SetScript('OnEvent', TitanPanelProfessionsButton_OnUpdate)
 end
 
-local function tableSize(t)
-    local size = 0
-    for _ in pairs(t) do
-        size = size + 1
-    end
+function TitanPanelRightClickMenu_PrepareProfessionsMenu()
+    --print('TitanPanelRightClickMenu_PrepareProfessionsMenu')
 
-    return size
+    local dropDownLevel = TitanPanelRightClickMenu_GetDropdownLevel()
+    local dropDownValue = TitanPanelRightClickMenu_GetDropdMenuValue()
+
+    if (dropDownLevel == 1) then
+        TitanPanelRightClickMenu_AddTitle(core.i18n.PluginName)
+
+        local infoGroupBy = {}
+        infoGroupBy.notCheckable = true
+
+        infoGroupBy.text = core.i18n.GroupBy;
+        -- if (TitanGetVar(TITAN_PROFESSIONS_ID, 'GroupByCharacter') == true) then
+        --     infoGroupBy.text = infoGroupBy.text .. 'Character'
+        -- else
+        --     infoGroupBy.text = infoGroupBy.text .. 'Profession'
+        -- end
+
+        infoGroupBy.value = "GROUPBY";
+        infoGroupBy.hasArrow = 1;
+        TitanPanelRightClickMenu_AddButton(infoGroupBy, dropDownLevel)
+
+        TitanPanelRightClickMenu_AddSeparator()
+        TitanPanelRightClickMenu_AddToggleIcon(TITAN_PROFESSIONS_ID)
+        TitanPanelRightClickMenu_AddToggleLabelText(TITAN_PROFESSIONS_ID)
+
+        TitanPanelRightClickMenu_AddSeparator()
+        TitanPanelRightClickMenu_AddCommand(L["TITAN_PANEL_MENU_HIDE"], TITAN_PROFESSIONS_ID, TITAN_PANEL_MENU_FUNC_HIDE)
+
+    elseif (dropDownLevel == 2 and dropDownValue == 'GROUPBY') then
+        local infoGroupByCharacter = {}
+        infoGroupByCharacter.text = core.i18n.GroupByChar;
+        infoGroupByCharacter.checked = TitanGetVar(TITAN_PROFESSIONS_ID, "GroupByCharacter");
+        infoGroupByCharacter.func = function()
+            TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByCharacter", true)
+            TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByProfession", false)
+            TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
+        end
+        TitanPanelRightClickMenu_AddButton(infoGroupByCharacter, TitanPanelRightClickMenu_GetDropdownLevel());
+
+        local infoGroupByProfession = {}
+        infoGroupByProfession.text = core.i18n.GroupByProf;
+        infoGroupByProfession.checked = TitanGetVar(TITAN_PROFESSIONS_ID, "GroupByProfession");
+        infoGroupByProfession.func = function()
+            TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByCharacter", false)
+            TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByProfession", true)
+            TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
+        end
+        TitanPanelRightClickMenu_AddButton(infoGroupByProfession, TitanPanelRightClickMenu_GetDropdownLevel());
+    end
 end
 
 local function trackRealm()
@@ -77,7 +115,7 @@ local function trackProfession(playerProfessionIndex)
         end
     end
 
-    local professionId = 1000 + tableSize(ProfessionsDB)
+    local professionId = 1000 + core.helper:tableSize(ProfessionsDB)
     ProfessionsDB[professionId] = {
         name = name,
         icon = icon
@@ -179,14 +217,6 @@ function TitanPanelProfessionsButton_GetButtonText(id)
     return result
 end
 
--- local function getProfessionName(professionId)
---     if (professionId == nil) then
---         return '-'
---     end
-
---     return ProfessionsDB[professionId].name
--- end
-
 function TitanPanelProfessionsButton_GetTooltipText(self)
     -- print('TitanPanelProfessionsButton_GetTooltipText')
 
@@ -204,11 +234,11 @@ function TitanPanelProfessionsButton_GetTooltipText(self)
 
             if (playerInfo.professions.prof1) then
                 local professionName = WrapTextInColorCode(ProfessionsDB[playerInfo.professions.prof1].name, 'ffffffff')
-                result = strconcat(result, professionName, '\t', '-', '\n')
+                result = strconcat(result, professionName, '\n') --, '\t', '-', '\n')
             end
             if (playerInfo.professions.prof2) then
                 local professionName = WrapTextInColorCode(ProfessionsDB[playerInfo.professions.prof2].name, 'ffffffff')
-                result = strconcat(result, professionName, '\t', '-', '\n')
+                result = strconcat(result, professionName, '\n') --, '\t', '-', '\n')
             end
 
         end

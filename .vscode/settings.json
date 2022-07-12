@@ -22,6 +22,18 @@
         "LOOT_SLOT_MONEY",
         "FrameStackTooltip_Toggle",
         "SlashCmdList",
-        "TitanGetVar"
+        "TitanGetVar",
+        "TitanPanelRightClickMenu_AddTitle",
+        "TitanPanelRightClickMenu_AddButton",
+        "TitanPanelRightClickMenu_AddSeparator",
+        "TitanPanelRightClickMenu_AddCommand",
+        "TITAN_PANEL_MENU_FUNC_HIDE",
+        "TitanPanelRightClickMenu_GetDropdownLevel",
+        "TitanPanelRightClickMenu_GetDropdMenuValue",
+        "TitanToggleVar",
+        "TitanPanelButton_UpdateButton",
+        "TitanPanelRightClickMenu_AddToggleIcon",
+        "TitanPanelRightClickMenu_AddToggleLabelText",
+        "TitanSetVar"
     ]
 }

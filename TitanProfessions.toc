@@ -7,4 +7,6 @@
 ## Dependencies: Titan
 ## Version: 9.0.1
 
+Local.lua
+Helper.lua
 TitanProfessions.xml
