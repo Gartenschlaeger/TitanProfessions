@@ -1,6 +1,6 @@
 ## Interface: 90205
-## Title: Titan Panel [|cff20d0ffProfessions|r]
-## Notes: Provides a Titan Panel menu button for Professions of all characters.
+## Title: Titan Panel [|cffeda55fProfessions|r] |cff00aa00|r
+## Notes: Adds professions overview button to TitanPanel
 ## Author: Kai Gartenschläger
 ## SavedVariables: RealmsDB, ProfessionsDB, PlayersDB
 ## OptionalDeps: 
