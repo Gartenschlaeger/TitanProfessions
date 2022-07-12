@@ -72,25 +72,17 @@ function TitanPanelRightClickMenu_PrepareProfessionsMenu()
         TitanPanelRightClickMenu_AddCommand(L["TITAN_PANEL_MENU_HIDE"], TITAN_PROFESSIONS_ID, TITAN_PANEL_MENU_FUNC_HIDE)
 
     elseif (dropDownLevel == 2 and dropDownValue == 'GROUPBY') then
-        local infoGroupByCharacter = {}
-        infoGroupByCharacter.text = core.i18n.GroupByChar;
-        infoGroupByCharacter.checked = TitanGetVar(TITAN_PROFESSIONS_ID, "GroupByCharacter");
-        infoGroupByCharacter.func = function()
+        core.helper:addButton(core.i18n.GroupByChar, 'GroupByCharacter', function()
             TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByCharacter", true)
             TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByProfession", false)
             TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
-        end
-        TitanPanelRightClickMenu_AddButton(infoGroupByCharacter, TitanPanelRightClickMenu_GetDropdownLevel());
+        end)
 
-        local infoGroupByProfession = {}
-        infoGroupByProfession.text = core.i18n.GroupByProf;
-        infoGroupByProfession.checked = TitanGetVar(TITAN_PROFESSIONS_ID, "GroupByProfession");
-        infoGroupByProfession.func = function()
+        core.helper:addButton(core.i18n.GroupByProf, 'GroupByProfession', function()
             TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByCharacter", false)
             TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByProfession", true)
             TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
-        end
-        TitanPanelRightClickMenu_AddButton(infoGroupByProfession, TitanPanelRightClickMenu_GetDropdownLevel());
+        end)
     end
 end
 
@@ -109,15 +101,10 @@ function TitanPanelProfessionsButton_GetButtonText(id)
         return
     end
 
-    local showLabel = TitanGetVar(TITAN_PROFESSIONS_ID, 'ShowLabelText')
-
     local result = ''
-
-    if (showLabel) then
-        result = core.i18n.PluginName .. ': '
+    if (TitanGetVar(TITAN_PROFESSIONS_ID, 'ShowLabelText')) then
+        result = strconcat(result, core.i18n.PluginName, ': ')
     end
-
-    result = result .. '|cffffffff'
 
     local playerGuid = UnitGUID('player')
     if (playerGuid) then
@@ -127,7 +114,68 @@ function TitanPanelProfessionsButton_GetButtonText(id)
         end
 
         if (playerInfo) then
-            result = result .. core.helper:buildPrimaryProfessionsText(playerInfo, ' / ', '-')
+            local professions = core.helper:buildPrimaryProfessionsText(playerInfo, ' / ', '-')
+            result = strconcat(result, WrapTextInColorCode(professions, 'ffffffff'))
+        end
+    end
+
+    return result
+end
+
+local function getTooltipGroupedByCharacter()
+    local sortedKeys = core.helper:getKeysSortedByValue(PlayersDB, function(a, b)
+        return a.name < b.name
+    end)
+
+    local result = ''
+    for _, playerGuid in pairs(sortedKeys) do
+        local playerInfo = PlayersDB[playerGuid]
+        if (playerInfo.professions.prof1 or playerInfo.professions.prof2) then
+            result = strconcat(result, '\n')
+
+            local name = playerInfo.name
+            if (playerInfo.class) then
+                name = RAID_CLASS_COLORS[playerInfo.class]:WrapTextInColorCode(playerInfo.name)
+            end
+
+            local professions = core.helper:buildPrimaryProfessionsText(playerInfo, ' / ', '-')
+            result = strconcat(result, name, '\t', WrapTextInColorCode(professions, 'ffffffff'))
+        end
+    end
+
+    return result
+end
+
+local function getTooltipGroupedByProfession()
+    local sortedKeys = core.helper:getKeysSortedByValue(ProfessionsDB, function(a, b)
+        return a.name < b.name
+    end)
+
+    local result = ''
+    for _, k in pairs(sortedKeys) do
+        local addProfession = false
+
+        local players = {}
+        for _, playerInfo in pairs(PlayersDB) do
+            if (playerInfo.professions.prof1 == k or
+                playerInfo.professions.prof2 == k or
+                playerInfo.professions.fishing == k or
+                playerInfo.professions.cooking == k or
+                playerInfo.professions.archaeology == k) then
+
+                local playerName = playerInfo.name
+                if (playerInfo.class) then
+                    playerName = RAID_CLASS_COLORS[playerInfo.class]:WrapTextInColorCode(playerInfo.name)
+                end
+
+                table.insert(players, playerName)
+                addProfession = true
+            end
+        end
+
+        if (addProfession) then
+            local profession = ProfessionsDB[k]
+            result = strconcat(result, '\n', profession.name, '\n', core.helper:joinTableValues(players, ', '), '\n')
         end
     end
 
@@ -137,30 +185,12 @@ end
 function TitanPanelProfessionsButton_GetTooltipText(self)
     -- print('TitanPanelProfessionsButton_GetTooltipText')
 
-    local result = ''
-    for _, playerInfo in pairs(PlayersDB) do
-        if (playerInfo.professions.prof1 or playerInfo.professions.prof2) then
-            result = strconcat(result, '\n')
-
-            local name = playerInfo.name
-            if (playerInfo.class) then
-                name = RAID_CLASS_COLORS[playerInfo.class]:WrapTextInColorCode(playerInfo.name)
-            end
-
-            result = strconcat(result, name, '\n')
-
-            if (playerInfo.professions.prof1) then
-                local professionName = WrapTextInColorCode(ProfessionsDB[playerInfo.professions.prof1].name, 'ffffffff')
-                result = strconcat(result, professionName, '\n') --, '\t', '-', '\n')
-            end
-            if (playerInfo.professions.prof2) then
-                local professionName = WrapTextInColorCode(ProfessionsDB[playerInfo.professions.prof2].name, 'ffffffff')
-                result = strconcat(result, professionName, '\n') --, '\t', '-', '\n')
-            end
-        end
+    local groupByCharacter = TitanGetVar(TITAN_PROFESSIONS_ID, "GroupByCharacter")
+    if (groupByCharacter) then
+        return getTooltipGroupedByCharacter()
+    else
+        return getTooltipGroupedByProfession()
     end
-
-    return result
 end
 
 function TitanPanelProfessionsButton_OnClick(self, button)
