@@ -7,4 +7,6 @@ if (GetLocale() == 'deDE') then
     l.GroupBy = 'Gruppieren nach'
     l.GroupByChar = 'Charakter'
     l.GroupByProf = 'Beruf'
+    l.Options = 'Optionen'
+    l.ClassColors = 'Klassen färben'
 end

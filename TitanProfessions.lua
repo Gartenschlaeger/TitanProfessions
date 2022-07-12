@@ -50,19 +50,8 @@ function TitanPanelRightClickMenu_PrepareProfessionsMenu()
     if (dropDownLevel == 1) then
         TitanPanelRightClickMenu_AddTitle(core.i18n.PluginName)
 
-        local infoGroupBy = {}
-        infoGroupBy.notCheckable = true
-
-        infoGroupBy.text = core.i18n.GroupBy;
-        -- if (TitanGetVar(TITAN_PROFESSIONS_ID, 'GroupByCharacter') == true) then
-        --     infoGroupBy.text = infoGroupBy.text .. 'Character'
-        -- else
-        --     infoGroupBy.text = infoGroupBy.text .. 'Profession'
-        -- end
-
-        infoGroupBy.value = "GROUPBY";
-        infoGroupBy.hasArrow = 1;
-        TitanPanelRightClickMenu_AddButton(infoGroupBy, dropDownLevel)
+        core.helper:addDropdownButton(core.i18n.GroupBy, 'GROUPBY')
+        core.helper:addDropdownButton(core.i18n.Options, 'OPTIONS')
 
         TitanPanelRightClickMenu_AddSeparator()
         TitanPanelRightClickMenu_AddToggleIcon(TITAN_PROFESSIONS_ID)
@@ -72,15 +61,20 @@ function TitanPanelRightClickMenu_PrepareProfessionsMenu()
         TitanPanelRightClickMenu_AddCommand(L["TITAN_PANEL_MENU_HIDE"], TITAN_PROFESSIONS_ID, TITAN_PANEL_MENU_FUNC_HIDE)
 
     elseif (dropDownLevel == 2 and dropDownValue == 'GROUPBY') then
-        core.helper:addButton(core.i18n.GroupByChar, 'GroupByCharacter', function()
+        core.helper:addCheckButton(core.i18n.GroupByChar, 'GroupByCharacter', function()
             TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByCharacter", true)
             TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByProfession", false)
             TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
         end)
 
-        core.helper:addButton(core.i18n.GroupByProf, 'GroupByProfession', function()
+        core.helper:addCheckButton(core.i18n.GroupByProf, 'GroupByProfession', function()
             TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByCharacter", false)
             TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByProfession", true)
+            TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
+        end)
+    elseif (dropDownLevel == 2 and dropDownValue == 'OPTIONS') then
+        core.helper:addCheckButton(core.i18n.ClassColors, 'ClassColors', function()
+            TitanSetVar(TITAN_PROFESSIONS_ID, "ClassColors", not TitanGetVar(TITAN_PROFESSIONS_ID, "ClassColors"))
             TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
         end)
     end
@@ -131,15 +125,9 @@ local function getTooltipGroupedByCharacter()
     for _, playerGuid in pairs(sortedKeys) do
         local playerInfo = PlayersDB[playerGuid]
         if (playerInfo.professions.prof1 or playerInfo.professions.prof2) then
-            result = strconcat(result, '\n')
-
-            local name = playerInfo.name
-            if (playerInfo.class) then
-                name = RAID_CLASS_COLORS[playerInfo.class]:WrapTextInColorCode(playerInfo.name)
-            end
-
+            local playerName = core.helper:getPlayerName(playerInfo)
             local professions = core.helper:buildPrimaryProfessionsText(playerInfo, ' / ', '-')
-            result = strconcat(result, name, '\t', WrapTextInColorCode(professions, 'ffffffff'))
+            result = strconcat(result, '\n', playerName, '\t', WrapTextInColorCode(professions, 'ffffffff'))
         end
     end
 
@@ -167,19 +155,20 @@ local function getTooltipGroupedByProfession()
                 playerInfo.professions.cooking == k or
                 playerInfo.professions.archaeology == k) then
 
-                local playerName = playerInfo.name
-                if (playerInfo.class) then
-                    playerName = RAID_CLASS_COLORS[playerInfo.class]:WrapTextInColorCode(playerInfo.name)
-                end
-
+                local playerName = core.helper:getPlayerName(playerInfo)
                 table.insert(players, playerName)
+
                 addProfession = true
             end
         end
 
         if (addProfession) then
             local profession = ProfessionsDB[k]
-            result = strconcat(result, '\n', profession.name, '\n', core.helper:joinTableValues(players, ', '), '\n')
+            local players = core.helper:joinTableValues(players, ', ')
+            if (not TitanGetVar(TITAN_PROFESSIONS_ID, "ClassColors")) then
+                players = WrapTextInColorCode(players, 'ffffffff')
+            end
+            result = strconcat(result, '\n', profession.name, '\n', players, '\n')
         end
     end
 

@@ -48,6 +48,15 @@ function helper:buildPrimaryProfessionsText(playerInfo, separator, defaultText)
     end
 end
 
+function helper:getPlayerName(playerInfo)
+    local name = playerInfo.name
+    if (playerInfo.class and TitanGetVar(TITAN_PROFESSIONS_ID, "ClassColors")) then
+        name = RAID_CLASS_COLORS[playerInfo.class]:WrapTextInColorCode(playerInfo.name)
+    end
+
+    return name
+end
+
 ---Joins table values by the given separator
 ---@param table table
 ---@param separator string
@@ -66,7 +75,16 @@ function helper:joinTableValues(table, separator)
     return result
 end
 
-function helper:addButton(text, valueKey, checkCallback)
+function helper:addDropdownButton(text, valueKey)
+    local info = {}
+    info.notCheckable = true
+    info.text = text;
+    info.value = valueKey;
+    info.hasArrow = true;
+    TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel())
+end
+
+function helper:addCheckButton(text, valueKey, checkCallback)
     local info = {}
     info.text = text;
     info.checked = TitanGetVar(TITAN_PROFESSIONS_ID, valueKey);
