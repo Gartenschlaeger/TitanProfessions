@@ -23,16 +23,19 @@ function TitanPanelProfessionsButton_OnLoad(self)
         buttonTextFunction = 'TitanPanelProfessionsButton_GetButtonText',
         tooltipTitle = 'Professions',
         tooltipTextFunction = 'TitanPanelProfessionsButton_GetTooltipText',
+        icon = "Interface\\ICONS\\INV_Misc_Gear_02",
+        iconWidth = 16,
         controlVariables = {
-            ShowIcon = false, -- TODO: icon
+            ShowIcon = true,
             ShowLabelText = true,
             DisplayOnRightSide = false,
         },
         savedVariables = {
-            ShowIcon = false,
+            ShowIcon = true,
             ShowLabelText = true,
             GroupByCharacter = true,
-            GroupByProfession = false
+            GroupByProfession = false,
+            ClassColors = true
         }
     };
 
