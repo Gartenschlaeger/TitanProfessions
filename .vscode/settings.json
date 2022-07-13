@@ -7,6 +7,7 @@
     },
     "wowAPI.locale": "enUS",
     "wowAPI.emmyLua.loadFrameXML": true,
+    "todo-tree.regex.regex": "(--|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
     "Lua.diagnostics.globals": [
         "GameTooltip",
         "UIDropDownMenu_SetWidth",

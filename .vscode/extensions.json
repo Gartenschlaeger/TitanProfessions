@@ -2,6 +2,7 @@
     "recommendations": [
         "ketho.wow-api",
         "stanzilla.vscode-wow-toc",
-        "sumneko.lua"
+        "sumneko.lua",
+        "Gruntfuggly.todo-tree"
     ]
 }
