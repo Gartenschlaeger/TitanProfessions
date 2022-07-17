@@ -41,6 +41,7 @@ function TitanPanelProfessionsButton_OnLoad(self)
 
     eventsFrame:RegisterEvent('PLAYER_ENTERING_WORLD')
     eventsFrame:RegisterEvent('PLAYER_LEAVING_WORLD')
+    eventsFrame:RegisterEvent('SPELLS_CHANGED')
     eventsFrame:SetScript('OnEvent', TitanPanelProfessionsButton_OnUpdate)
 end
 
@@ -87,6 +88,8 @@ function TitanPanelProfessionsButton_OnUpdate(self, event, ...)
     -- print('TitanPanelProfessionsButton_OnUpdate', event, ...)
 
     if (event == 'PLAYER_ENTERING_WORLD') then
+        core.tracking:trackPlayer()
+    elseif (event == 'SPELLS_CHANGED') then
         core.tracking:trackPlayer()
     end
 end

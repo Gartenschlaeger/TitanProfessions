@@ -36,6 +36,8 @@ local function trackProfession(playerProfessionIndex)
 end
 
 function tracking:trackPlayer()
+    -- print('tracking:trackPlayer')
+
     local playerGuid = UnitGUID('player')
     if (not playerGuid) then
         return
@@ -57,6 +59,13 @@ function tracking:trackPlayer()
     info.professions.archaeology = trackProfession(archaeology)
     info.professions.fishing = trackProfession(fishing)
     info.professions.cooking = trackProfession(cooking)
+
+    -- print('professions:',
+    --     info.professions.prof1,
+    --     info.professions.prof2,
+    --     info.professions.archaeology,
+    --     info.professions.cooking,
+    --     info.professions.cooking)
 
     return info
 end
