@@ -5,9 +5,10 @@ local l = {}
 core.i18n = l
 
 l.PluginName = 'Professions'
-l.GroupBy = 'Group by'
+l.GroupBy = 'Grouping'
 l.GroupByChar = 'Character'
 l.GroupByProf = 'Profession'
-l.Options = 'Options'
+l.Appearance = 'Appearance'
+l.Show = 'Professions'
 l.ClassColors = 'Class colors'
 l.ProfessionIcons = 'Show profession icons'

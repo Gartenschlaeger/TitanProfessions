@@ -61,12 +61,5 @@ function tracking.trackPlayer(self)
     info.professions.fishing = trackProfession(fishing)
     info.professions.cooking = trackProfession(cooking)
 
-    -- print('professions:',
-    --     info.professions.prof1,
-    --     info.professions.prof2,
-    --     info.professions.archaeology,
-    --     info.professions.cooking,
-    --     info.professions.cooking)
-
     return info
 end

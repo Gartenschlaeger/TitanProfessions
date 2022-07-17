@@ -27,25 +27,44 @@ function helper.getKeysSortedByValue(self, tbl, sortFunction)
     return keys
 end
 
-function helper.buildPrimaryProfessionsText(self, playerInfo, separator, defaultText)
-    local prof1 = playerInfo.professions.prof1
-    local prof2 = playerInfo.professions.prof2
-    if (prof1 or prof2) then
+---Returns true if the given profession should be shown
+---@param professionId number|nil
+---@return boolean
+function helper.isProfessionShown(self, professionId)
+    if (professionId) then
+        return not ProfessionsDB[professionId].isHidden
+    end
+    return false
+end
+
+---Builds text for primary professions for the given player info
+---@param playerInfo table
+---@param addIcons boolean
+---@return string
+function helper.buildPrimaryProfessionsText(self, playerInfo, addIcons, forceShow)
+    local prof1Shown = forceShow or self:isProfessionShown(playerInfo.professions.prof1)
+    local prof2Shown = forceShow or self:isProfessionShown(playerInfo.professions.prof2)
+    if (prof1Shown or prof2Shown) then
         local result = ''
-        if (prof1) then
-            result = result .. self:getProfessionText(ProfessionsDB[prof1])
-            if (prof2) then
-                result = result .. separator
+
+        if (prof1Shown) then
+            result = result .. self:getProfessionText(ProfessionsDB[playerInfo.professions.prof1], addIcons)
+            if (prof2Shown) then
+                if (addIcons) then
+                    result = result .. ' '
+                else
+                    result = result .. ' / '
+                end
             end
         end
 
-        if (prof2) then
-            result = result .. self:getProfessionText(ProfessionsDB[prof2])
+        if (prof2Shown) then
+            result = result .. self:getProfessionText(ProfessionsDB[playerInfo.professions.prof2], addIcons)
         end
 
         return result
     else
-        return defaultText
+        return '-'
     end
 end
 
@@ -58,12 +77,15 @@ function helper.getPlayerName(self, playerInfo)
     return name
 end
 
-function helper.getProfessionText(self, profession)
-    local showProfessionIcons = TitanGetVar(TITAN_PROFESSIONS_ID, "ShowProfessionIcons")
-    if (showProfessionIcons) then
-        return string.format('|T' .. profession.icon .. ':12|t ' .. profession.name)
+---Formates the profession text
+---@param professionInfo table
+---@param addIcon boolean
+---@return string
+function helper.getProfessionText(self, professionInfo, addIcon)
+    if (addIcon) then
+        return string.format('|T' .. professionInfo.icon .. ':12|t ' .. professionInfo.name)
     else
-        return profession.name
+        return professionInfo.name
     end
 end
 
@@ -94,11 +116,19 @@ function helper.addDropdownButton(self, text, valueKey)
     TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel())
 end
 
-function helper.addCheckButton(self, text, valueKey, checkCallback)
+function helper.addCheckButton(self, text, isChecked, checkCallback)
     local info = {}
     info.text = text;
-    info.checked = TitanGetVar(TITAN_PROFESSIONS_ID, valueKey);
+    info.checked = isChecked
     info.func = checkCallback
 
     TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
+end
+
+function helper.ifNil(self, value, valueIfNil)
+    if (value == nil) then
+        return valueIfNil
+    end
+
+    return value
 end
