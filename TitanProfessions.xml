@@ -14,6 +14,9 @@
 						TitanPanelProfessionsButton_OnClick(self, button);
 						TitanPanelButton_OnClick(self, button);
 					</OnClick>
+                    <OnEvent>
+						TitanPanelProfessions_OnEvent(self, event, ...);
+					</OnEvent>
                 </Scripts>
             </Button>
         </Frames>

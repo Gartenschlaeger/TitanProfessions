@@ -10,8 +10,6 @@ PlayersDB = {}
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Titan", true)
 
-local eventsFrame = CreateFrame("frame")
-
 function TitanPanelProfessionsButton_OnLoad(self)
     --  print('TitanPanelProfessionsButton_OnLoad')
 
@@ -39,10 +37,19 @@ function TitanPanelProfessionsButton_OnLoad(self)
         }
     };
 
-    eventsFrame:RegisterEvent('PLAYER_ENTERING_WORLD')
-    eventsFrame:RegisterEvent('PLAYER_LEAVING_WORLD')
-    eventsFrame:RegisterEvent('SPELLS_CHANGED')
-    eventsFrame:SetScript('OnEvent', TitanPanelProfessionsButton_OnUpdate)
+    self:RegisterEvent('PLAYER_ENTERING_WORLD')
+    self:RegisterEvent('PLAYER_LEAVING_WORLD')
+    self:RegisterEvent('SPELLS_CHANGED')
+end
+
+function TitanPanelProfessions_OnEvent(self, event, ...)
+    -- print('TitanPanelProfessions_OnEvent', event)
+    if (event == 'PLAYER_ENTERING_WORLD') then
+        core.tracking:trackPlayer()
+    elseif (event == 'SPELLS_CHANGED') then
+        core.tracking:trackPlayer()
+        TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
+    end
 end
 
 function TitanPanelRightClickMenu_PrepareProfessionsMenu()
@@ -81,16 +88,6 @@ function TitanPanelRightClickMenu_PrepareProfessionsMenu()
             TitanSetVar(TITAN_PROFESSIONS_ID, "ClassColors", not TitanGetVar(TITAN_PROFESSIONS_ID, "ClassColors"))
             TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
         end)
-    end
-end
-
-function TitanPanelProfessionsButton_OnUpdate(self, event, ...)
-    -- print('TitanPanelProfessionsButton_OnUpdate', event, ...)
-
-    if (event == 'PLAYER_ENTERING_WORLD') then
-        core.tracking:trackPlayer()
-    elseif (event == 'SPELLS_CHANGED') then
-        core.tracking:trackPlayer()
     end
 end
 
