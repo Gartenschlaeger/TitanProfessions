@@ -19,7 +19,7 @@ function TitanPanelProfessionsButton_OnLoad(self)
         version = TITAN_PROFESSIONS_VERSION,
         menuText = core.i18n.PluginName,
         buttonTextFunction = 'TitanPanelProfessionsButton_GetButtonText',
-        tooltipTitle = 'Professions',
+        tooltipTitle = core.i18n.PluginName,
         tooltipTextFunction = 'TitanPanelProfessionsButton_GetTooltipText',
         icon = "Interface\\ICONS\\INV_Misc_Gear_02",
         iconWidth = 16,
