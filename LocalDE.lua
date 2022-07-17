@@ -9,4 +9,5 @@ if (GetLocale() == 'deDE') then
     l.GroupByProf = 'Beruf'
     l.Options = 'Optionen'
     l.ClassColors = 'Klassen färben'
+    l.ProfessionIcons = 'Berufssymbole anzeigen'
 end

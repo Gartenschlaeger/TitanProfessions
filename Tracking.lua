@@ -1,6 +1,7 @@
 ---@class TitanPanel_ProfessionsCore
 local _, core = ...
 
+---@class TitanPanel_ProfessionsTracking
 local tracking = {}
 core.tracking = tracking
 
@@ -35,7 +36,7 @@ local function trackProfession(playerProfessionIndex)
     return professionId
 end
 
-function tracking:trackPlayer()
+function tracking.trackPlayer(self)
     -- print('tracking:trackPlayer')
 
     local playerGuid = UnitGUID('player')

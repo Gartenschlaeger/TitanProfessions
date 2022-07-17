@@ -33,7 +33,8 @@ function TitanPanelProfessionsButton_OnLoad(self)
             ShowLabelText = true,
             GroupByCharacter = true,
             GroupByProfession = false,
-            ClassColors = true
+            ClassColors = true,
+            ShowProfessionIcons = false
         }
     };
 
@@ -86,6 +87,12 @@ function TitanPanelRightClickMenu_PrepareProfessionsMenu()
     elseif (dropDownLevel == 2 and dropDownValue == 'OPTIONS') then
         core.helper:addCheckButton(core.i18n.ClassColors, 'ClassColors', function()
             TitanSetVar(TITAN_PROFESSIONS_ID, "ClassColors", not TitanGetVar(TITAN_PROFESSIONS_ID, "ClassColors"))
+            TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
+        end)
+
+        core.helper:addCheckButton(core.i18n.ProfessionIcons, 'ShowProfessionIcons', function()
+            TitanSetVar(TITAN_PROFESSIONS_ID, "ShowProfessionIcons",
+                not TitanGetVar(TITAN_PROFESSIONS_ID, "ShowProfessionIcons"))
             TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
         end)
     end
@@ -171,7 +178,8 @@ local function getTooltipGroupedByProfession()
             if (not TitanGetVar(TITAN_PROFESSIONS_ID, "ClassColors")) then
                 players = WrapTextInColorCode(players, 'ffffffff')
             end
-            result = strconcat(result, '\n', profession.name, '\n', players, '\n')
+
+            result = strconcat(result, '\n', core.helper:getProfessionText(profession), '\n', players, '\n')
         end
     end
 
