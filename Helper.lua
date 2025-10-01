@@ -42,8 +42,11 @@ end
 ---@param addIcons boolean
 ---@return string
 function helper.buildPrimaryProfessionsText(self, playerInfo, addIcons, forceShow)
-    local prof1Shown = forceShow or self:isProfessionShown(playerInfo.professions.prof1)
-    local prof2Shown = forceShow or self:isProfessionShown(playerInfo.professions.prof2)
+    local prof1Shown = playerInfo.professions.prof1 ~= nil and
+    (forceShow or self:isProfessionShown(playerInfo.professions.prof1))
+    local prof2Shown = playerInfo.professions.prof2 ~= nil and
+    (forceShow or self:isProfessionShown(playerInfo.professions.prof2))
+
     if (prof1Shown or prof2Shown) then
         local result = ''
 

@@ -1,11 +1,11 @@
-## Interface: 90205
+## Interface: 110200
 ## Title: Titan Panel [|cffeda55fProfessions|r] |cff00aa00|r
 ## Notes: Adds professions overview button to TitanPanel
 ## Author: Kai Gartenschläger
 ## SavedVariables: RealmsDB, ProfessionsDB, PlayersDB
 ## OptionalDeps: 
 ## Dependencies: Titan
-## Version: 9.0.1
+## Version: 9.0.2
 
 Local.lua
 LocalDE.lua
