@@ -1,7 +1,7 @@
 ---@class TitanPanel_ProfessionsCore
 local _, core = ...
 
-TITAN_PROFESSIONS_VERSION = "9.0.1"
+TITAN_PROFESSIONS_VERSION = "9.1.0"
 TITAN_PROFESSIONS_ID = "Professions"
 
 RealmsDB = {}
@@ -34,7 +34,9 @@ function TitanPanelProfessionsButton_OnLoad(self)
             GroupByCharacter = true,
             GroupByProfession = false,
             ClassColors = true,
-            ShowProfessionIcons = false
+            ShowProfessionIcons = false,
+            FilterByRealm = true,
+            FilterByFaction = true,
         }
     };
 
@@ -45,6 +47,7 @@ end
 
 function TitanPanelProfessions_OnEvent(self, event, ...)
     -- print('TitanPanelProfessions_OnEvent', event)
+
     if (event == 'PLAYER_ENTERING_WORLD') then
         core.tracking:trackPlayer()
     elseif (event == 'SPELLS_CHANGED') then
@@ -75,7 +78,6 @@ function TitanPanelRightClickMenu_PrepareProfessionsMenu()
 
         TitanPanelRightClickMenu_AddSeparator()
         TitanPanelRightClickMenu_AddCommand(L["TITAN_PANEL_MENU_HIDE"], TITAN_PROFESSIONS_ID, TITAN_PANEL_MENU_FUNC_HIDE)
-
     elseif (dropDownLevel == 2 and dropDownValue == 'GROUPBY') then
         core.helper:addCheckButton(core.i18n.GroupByChar,
             TitanGetVar(TITAN_PROFESSIONS_ID, 'GroupByCharacter'),
@@ -92,7 +94,6 @@ function TitanPanelRightClickMenu_PrepareProfessionsMenu()
                 TitanSetVar(TITAN_PROFESSIONS_ID, "GroupByProfession", true)
                 TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
             end)
-
     elseif (dropDownLevel == 2 and dropDownValue == 'APPEARANCE') then
         core.helper:addCheckButton(core.i18n.ClassColors,
             TitanGetVar(TITAN_PROFESSIONS_ID, 'ClassColors'),
@@ -109,6 +110,21 @@ function TitanPanelRightClickMenu_PrepareProfessionsMenu()
                 TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
             end)
 
+        core.helper:addCheckButton(core.i18n.FilterByRealm,
+            TitanGetVar(TITAN_PROFESSIONS_ID, 'FilterByRealm'),
+            function()
+                TitanSetVar(TITAN_PROFESSIONS_ID, "FilterByRealm",
+                    not TitanGetVar(TITAN_PROFESSIONS_ID, "FilterByRealm"))
+                TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
+            end)
+
+        core.helper:addCheckButton(core.i18n.FilterByFraction,
+            TitanGetVar(TITAN_PROFESSIONS_ID, 'FilterByFaction'),
+            function()
+                TitanSetVar(TITAN_PROFESSIONS_ID, "FilterByFaction",
+                    not TitanGetVar(TITAN_PROFESSIONS_ID, "FilterByFaction"))
+                TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
+            end)
     elseif (dropDownLevel == 2 and dropDownValue == 'SHOW') then
         local sortedKeys = core.helper:getKeysSortedByValue(ProfessionsDB, function(a, b)
             return a.name < b.name
@@ -123,7 +139,6 @@ function TitanPanelRightClickMenu_PrepareProfessionsMenu()
                     TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
                 end)
         end
-
     end
 end
 
@@ -155,18 +170,29 @@ function TitanPanelProfessionsButton_GetButtonText(id)
     return result
 end
 
-local function getTooltipGroupedByCharacter()
+local function getTooltipGroupedByCharacter(filterByRealm, filterByFaction)
+    local currentFactionName, _ = UnitFactionGroup("player")
+
+    local addIcons = TitanGetVar(TITAN_PROFESSIONS_ID, "ShowProfessionIcons")
+
     local sortedKeys = core.helper:getKeysSortedByValue(PlayersDB, function(a, b)
         return a.name < b.name
     end)
 
-    local addIcons = TitanGetVar(TITAN_PROFESSIONS_ID, "ShowProfessionIcons")
-
     local result = ''
     for _, playerGuid in pairs(sortedKeys) do
         local playerInfo = PlayersDB[playerGuid]
-        if (core.helper:isProfessionShown(playerInfo.professions.prof1) or
-            core.helper:isProfessionShown(playerInfo.professions.prof2)) then
+
+        local includePlayer = true
+        if (filterByRealm and playerInfo.realm ~= currentRealmId) then
+            includePlayer = false
+        end
+        if (filterByFaction and currentFactionName and playerInfo.faction and playerInfo.faction ~= currentFactionName) then
+            includePlayer = false
+        end
+
+        if (includePlayer and (
+                core.helper:isProfessionShown(playerInfo.professions.prof1) or core.helper:isProfessionShown(playerInfo.professions.prof2))) then
             local playerName = core.helper:getPlayerName(playerInfo)
             local professions = core.helper:buildPrimaryProfessionsText(playerInfo, addIcons, false)
             result = strconcat(result, '\n', playerName, '\t', WrapTextInColorCode(professions, 'ffffffff'))
@@ -176,7 +202,10 @@ local function getTooltipGroupedByCharacter()
     return result
 end
 
-local function getTooltipGroupedByProfession()
+local function getTooltipGroupedByProfession(filterByRealm, filterByFaction)
+    local currentRealmId = GetRealmID()
+    local currentFactionName, _ = UnitFactionGroup("player")
+
     local sortedProfessionKeys = core.helper:getKeysSortedByValue(ProfessionsDB, function(a, b)
         return a.name < b.name
     end)
@@ -193,15 +222,26 @@ local function getTooltipGroupedByProfession()
         local players = {}
         for _, playerGuid in pairs(sortedPlayerKeys) do
             local playerInfo = PlayersDB[playerGuid]
-            if ((playerInfo.professions.prof1 == k and core.helper:isProfessionShown(playerInfo.professions.prof1)) or
-                (playerInfo.professions.prof2 == k and core.helper:isProfessionShown(playerInfo.professions.prof2)) or
-                (playerInfo.professions.fishing == k and core.helper:isProfessionShown(playerInfo.professions.fishing))
-                or
-                (playerInfo.professions.cooking == k and core.helper:isProfessionShown(playerInfo.professions.cooking))
-                or
-                (playerInfo.professions.archaeology == k) and
-                core.helper:isProfessionShown(playerInfo.professions.archaeology)) then
 
+            local includePlayer = true
+            if (filterByRealm and playerInfo.realm ~= currentRealmId) then
+                includePlayer = false
+            end
+            if (filterByFaction and currentFactionName and playerInfo.faction and playerInfo.faction ~= currentFactionName) then
+                includePlayer = false
+            end
+
+            if (includePlayer and (
+                    (playerInfo.professions.prof1 == k and core.helper:isProfessionShown(playerInfo.professions.prof1))
+                    or
+                    (playerInfo.professions.prof2 == k and core.helper:isProfessionShown(playerInfo.professions.prof2))
+                    or
+                    (playerInfo.professions.fishing == k and core.helper:isProfessionShown(playerInfo.professions.fishing))
+                    or
+                    (playerInfo.professions.cooking == k and core.helper:isProfessionShown(playerInfo.professions.cooking))
+                    or
+                    (playerInfo.professions.archaeology == k) and core.helper:isProfessionShown(playerInfo.professions.archaeology))
+                ) then
                 local playerName = core.helper:getPlayerName(playerInfo)
                 table.insert(players, playerName)
 
@@ -227,14 +267,17 @@ function TitanPanelProfessionsButton_GetTooltipText(self)
     -- print('TitanPanelProfessionsButton_GetTooltipText')
 
     local groupByCharacter = TitanGetVar(TITAN_PROFESSIONS_ID, "GroupByCharacter")
+
+    local filterByRealm = TitanGetVar(TITAN_PROFESSIONS_ID, "FilterByRealm") or false
+    local filterByFaction = TitanGetVar(TITAN_PROFESSIONS_ID, "FilterByFaction") or false
+
     if (groupByCharacter) then
-        return getTooltipGroupedByCharacter()
+        return getTooltipGroupedByCharacter(filterByRealm, filterByFaction)
     else
-        return getTooltipGroupedByProfession()
+        return getTooltipGroupedByProfession(filterByRealm, filterByFaction)
     end
 end
 
 function TitanPanelProfessionsButton_OnClick(self, button)
     -- print('TitanPanelProfessionsButton_OnClick')
-
 end
