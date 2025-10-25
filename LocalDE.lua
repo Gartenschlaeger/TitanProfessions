@@ -11,4 +11,6 @@ if (GetLocale() == 'deDE') then
     l.Show = 'Berufe'
     l.ClassColors = 'Klassen färben'
     l.ProfessionIcons = 'Berufssymbole anzeigen'
+    l.FilterByRealm = 'Auf aktuellen Realm filtern'
+    l.FilterByFaction = 'Auf Fraktion filtern'
 end

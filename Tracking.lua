@@ -49,9 +49,12 @@ function tracking.trackPlayer(self)
 
     local _, unitClass = UnitClass('player')
 
+    local factionName, _ = UnitFactionGroup("player")
+
     info.realm = trackRealm()
     info.name = UnitName('player')
     info.class = unitClass
+    info.faction = factionName
 
     local prof1, prof2, archaeology, fishing, cooking = GetProfessions()
     info.professions = {}
