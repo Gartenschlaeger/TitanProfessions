@@ -118,7 +118,7 @@ function TitanPanelRightClickMenu_PrepareProfessionsMenu()
                 TitanPanelButton_UpdateButton(TITAN_PROFESSIONS_ID)
             end)
 
-        core.helper:addCheckButton(core.i18n.FilterByFraction,
+        core.helper:addCheckButton(core.i18n.FilterByFaction,
             TitanGetVar(TITAN_PROFESSIONS_ID, 'FilterByFaction'),
             function()
                 TitanSetVar(TITAN_PROFESSIONS_ID, "FilterByFaction",
