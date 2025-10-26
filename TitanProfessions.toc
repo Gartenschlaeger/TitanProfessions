@@ -5,7 +5,7 @@
 ## SavedVariables: RealmsDB, ProfessionsDB, PlayersDB
 ## OptionalDeps: 
 ## Dependencies: Titan
-## Version: 9.1.0
+## Version: 9.1.1
 
 Local.lua
 LocalDE.lua

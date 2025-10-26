@@ -1,7 +1,7 @@
 ---@class TitanPanel_ProfessionsCore
 local _, core = ...
 
-TITAN_PROFESSIONS_VERSION = "9.1.0"
+TITAN_PROFESSIONS_VERSION = "9.1.1"
 TITAN_PROFESSIONS_ID = "Professions"
 
 RealmsDB = {}
@@ -171,6 +171,7 @@ function TitanPanelProfessionsButton_GetButtonText(id)
 end
 
 local function getTooltipGroupedByCharacter(filterByRealm, filterByFaction)
+    local currentRealmId = GetRealmID()
     local currentFactionName, _ = UnitFactionGroup("player")
 
     local addIcons = TitanGetVar(TITAN_PROFESSIONS_ID, "ShowProfessionIcons")
